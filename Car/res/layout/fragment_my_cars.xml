@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white" >
+     <include
+        android:id="@+id/detailTitlebar"
+        layout="@layout/titlebar_detail" /> 
+	<Button
+	    android:id="@+id/btn_add"
+	    android:layout_width="match_parent"
+	    android:layout_height="45dp"
+	    android:text="增加新车型"
+	    android:textSize="@dimen/text_big"
+	    android:textColor="@color/text_color_gray"
+	    android:layout_margin="10dp"
+	    android:background="@drawable/bg_gray_round_corner"
+	    android:layout_alignParentBottom="true"/>
+	<ListView
+	    android:id="@+id/lv_cars"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:listSelector="@drawable/list_selector"
+	    android:divider="@color/full_transparent"
+	    android:layout_above="@id/btn_add"
+	    android:layout_below="@id/detailTitlebar"/>
+</RelativeLayout>

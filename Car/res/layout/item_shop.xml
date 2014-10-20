@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:gravity="center_vertical"
+        android:padding="10dp" >
+
+        <com.sky.car.widget.SHImageView
+            android:id="@+id/iv_shop"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/subicon_repair" />
+
+        <TextView
+            android:id="@+id/tv_shopname"
+            android:layout_width="200dp"
+            android:singleLine="true"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/iv_shop"
+            android:text="XX洗车店（上海店）"
+            android:textColor="@color/text_color_black"
+            android:textSize="@dimen/text_mid" />
+
+        <TextView
+            android:id="@+id/tv_normal_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_shopname"
+            android:layout_marginTop="1dp"
+            android:layout_toRightOf="@id/iv_shop"
+            android:text="普洗：25元"
+            android:textColor="@color/text_color_gray"
+            android:textSize="@dimen/text_small" />
+
+        <TextView
+            android:id="@+id/tv_special_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/tv_normal_price"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/tv_normal_price"
+            android:text="特价：15元"
+            android:textColor="@color/red"
+            android:textSize="@dimen/text_small" />
+
+        <TextView
+            android:id="@+id/tv_address"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:layout_below="@id/tv_normal_price"
+            android:layout_marginTop="1dp"
+            android:layout_toRightOf="@id/iv_shop"
+            android:text="平阳路50号"
+            android:textColor="@color/text_color_gray"
+            android:textSize="12sp" />
+        
+        	<TextView
+            android:id="@+id/tv_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/tv_shopname"
+            android:text=""
+            android:textColor="@color/text_color_gray"
+            android:textSize="@dimen/text_small" />
+        	<TextView
+            android:id="@+id/tv_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/tv_address"
+            android:text=""
+            android:textColor="@color/text_color_gray"
+            android:textSize="@dimen/text_small" />
+    </RelativeLayout>
+
+</RelativeLayout>

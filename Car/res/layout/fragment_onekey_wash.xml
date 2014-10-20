@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+     <include
+        android:id="@+id/detailTitlebar"
+        layout="@layout/titlebar_detail" /> 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal" 
+        android:background="@color/text_color_gray"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+		<EditText
+		    android:id="@+id/et_keyword"
+		    android:layout_width="match_parent"
+		    android:layout_height="36dp"
+		    android:layout_centerVertical="true"
+		    android:gravity="center_vertical"
+		    android:padding="5dp"
+		    android:textColor="@color/text_color_black"
+		    android:textSize="@dimen/text_mid"
+		    android:hint="请输入商户名"
+		    android:drawableLeft="@drawable/ic_search"
+		    android:drawablePadding="5dp"
+		    android:background="@drawable/bg_gray_line_white_content"
+		    android:imeOptions="actionSearch"
+		    android:singleLine="true"
+		    android:inputType="text"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+            <requestFocus/>
+        </LinearLayout>
+    </RelativeLayout>
+
+
+    <com.sky.car.widget.SHListView
+        android:id="@+id/lv_shop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@color/line_gray"
+        android:dividerHeight="1px" 
+        android:listSelector="@drawable/list_selector"/> 
+	<TextView
+	    android:id="@+id/tv_tip"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:gravity="center"
+	    android:textSize="@dimen/text_mid"
+	    android:textColor="@color/text_color_gray"
+	    android:text="没有找到附近商家~"
+	    android:visibility="gone"/>
+</LinearLayout>

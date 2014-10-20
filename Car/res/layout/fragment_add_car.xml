@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+     <include
+        android:id="@+id/detailTitlebar"
+        layout="@layout/titlebar_detail" /> 
+	<LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <com.sky.car.widget.CircularImage
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:src="@color/orange" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="车型："
+            android:textColor="@color/text_color_gray"
+            android:textSize="@dimen/text_mid" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_brand"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:textSize="@dimen/text_big"
+        android:text="请选择品牌"
+        android:textColor="@color/text_color_gray"
+        android:background="@drawable/bg_dark_line_gray_content"
+        android:gravity="center_vertical"
+        android:drawableRight="@drawable/ic_arrow_down"
+        android:layout_margin="10dp"
+        android:padding="10dp"/>
+    <TextView
+        android:id="@+id/tv_xilie"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:textSize="@dimen/text_big"
+        android:text="车系选择"
+        android:textColor="@color/text_color_gray"
+        android:background="@drawable/bg_dark_line_gray_content"
+        android:gravity="center_vertical"
+        android:drawableRight="@drawable/ic_arrow_down"
+        android:layout_margin="10dp"
+        android:padding="10dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <com.sky.car.widget.CircularImage
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:src="@color/orange" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="车牌号："
+            android:textColor="@color/text_color_gray"
+            android:textSize="@dimen/text_mid" />
+    </LinearLayout> 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_blue"
+        android:layout_margin="10dp"
+        android:padding="5dp">
+        <TextView
+            android:id="@+id/tv_pro"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:drawableRight="@drawable/ic_arrow_white_down"
+            android:padding="5dp"
+            android:text="-"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="@dimen/text_mid"
+            android:textColor="@color/white"/>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:layout_margin="5dp"/>
+         <TextView
+            android:id="@+id/tv_area"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:drawableRight="@drawable/ic_arrow_white_down"
+            android:padding="5dp"
+            android:text="-"
+            android:layout_height="match_parent"
+            android:textSize="@dimen/text_mid"
+            android:textColor="@color/white"
+            android:gravity="center"/>
+          <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:layout_margin="5dp"/>
+          <EditText
+            android:id="@+id/et_no"
+            android:layout_width="0dp"
+            android:layout_weight="2.5"
+            android:padding="5dp"
+            android:text="1111"
+            android:background="@null"
+            android:singleLine="true"
+            android:layout_height="match_parent"
+            android:textSize="@dimen/text_mid"
+            android:textColor="@color/white"
+            android:gravity="center"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_blue_round_corner"
+        android:layout_margin="10dp"
+        android:textSize="@dimen/text_big"
+        android:textColor="@color/white"
+        android:text="保存"/>
+    <Button
+        android:id="@+id/btn_delete"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_red_round_corner"
+        android:layout_margin="10dp"
+        android:textSize="@dimen/text_big"
+        android:textColor="@color/white"
+        android:text="刪除"/>
+</LinearLayout>
