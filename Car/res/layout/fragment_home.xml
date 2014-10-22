@@ -146,42 +146,45 @@
         android:padding="10dp" >
 
         <TextView
+            android:id="@+id/tv_jinji"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="紧急援助"
+            android:drawableTop="@drawable/subicon_support"
+            android:textColor="@color/text_color_gray"
+            android:textSize="@dimen/text_mid" />
+
+        <TextView
             android:id="@+id/tv_baoyang"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
             android:text="保养维修"
-            android:drawableTop="@drawable/subicon_support"
-            android:textColor="@color/text_color_gray"
-            android:textSize="@dimen/text_mid" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="紧急救援"
             android:drawableTop="@drawable/subicon_repair"
             android:textColor="@color/text_color_gray"
             android:textSize="@dimen/text_mid" />
         
         <TextView
+            android:id="@+id/tv_baoxian"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="保险理赔"
+            android:text="保险"
             android:drawableTop="@drawable/subicon_insurance"
             android:textColor="@color/text_color_gray"
             android:textSize="@dimen/text_mid" />
         
         <TextView
+            android:id="@+id/tv_zhuanjia"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="更多"
+            android:text="专家解疑"
             android:drawableTop="@drawable/subicon_more"
             android:textColor="@color/text_color_gray"
             android:textSize="@dimen/text_mid" />

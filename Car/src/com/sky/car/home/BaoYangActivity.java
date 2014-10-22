@@ -34,7 +34,6 @@ public class BaoYangActivity extends BaseNormalActivity {
 	private TextView mTv_location,mTv_add_photo,mTv_add_voice;
 	
 	private static final int MIN_RECORD_TIME = 1; // 最短录制时间，单位秒，0为无时间限制
-
     private static final int RECORD_OFF = 0; // 不在录音
     private static final int RECORD_ON = 1; // 正在录音
     private static final String RECORD_FILENAME = "record0033"; // 录音文件名
@@ -242,7 +241,7 @@ public class BaoYangActivity extends BaseNormalActivity {
             mRecordDialog.getWindow().setFlags(
                     WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            mRecordDialog.setContentView(R.layout.record_dialog);
+            mRecordDialog.setContentView(R.layout.dialog_record);
             mIvRecVolume = (ImageView) mRecordDialog.findViewById(R.id.record_dialog_img);
             mTvRecordDialogTxt = (TextView) mRecordDialog.findViewById(R.id.record_dialog_txt);
         }

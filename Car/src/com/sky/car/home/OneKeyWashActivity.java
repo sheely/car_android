@@ -52,6 +52,7 @@ public class OneKeyWashActivity extends BaseNormalActivity implements ITaskListe
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(OneKeyWashActivity.this, WashMapActivity.class);
 				intent.putExtra("jsonArray", jsonArray.toString());
+				intent.putExtra("type", 0);//0:Ò»¼üÏ´³µ
 				startActivity(intent);
 			}
 		});

@@ -54,6 +54,7 @@ public class LoginActivity extends BaseActivity implements ITaskListener{
 				getCodeTask = new SHPostTaskM();
 				getCodeTask.setUrl(ConfigDefinition.URL+"smssend.action");
 				getCodeTask.setListener(LoginActivity.this);
+				SHEnvironment.getInstance().setLoginId(phone);
 				getCodeTask.start();
 			}
 		});

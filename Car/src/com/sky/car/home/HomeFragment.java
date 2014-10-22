@@ -21,7 +21,7 @@ import com.sky.widget.SHDialog;
 
 public class HomeFragment extends BaseFragment implements ITaskListener{
 
-	private TextView mTv_onekey,mTv_check,mTv_manage,mTv_car_xilie,mTv_car_number,mTv_baoyang;
+	private TextView mTv_onekey,mTv_check,mTv_manage,mTv_car_xilie,mTv_car_number,mTv_jinji,mTv_baoyang,mTv_baoxian,mTv_zhuanjia;
 //	private SHPostTaskM carTask;
 	private SHImageView iv_car_logo;
 	public static JSONObject json;//µ±Ç°³µÁ¾
@@ -52,12 +52,18 @@ public class HomeFragment extends BaseFragment implements ITaskListener{
 		iv_car_logo = (SHImageView) view.findViewById(R.id.iv_car_logo);
 		mTv_car_xilie = (TextView) view.findViewById(R.id.tv_car_xilie);
 		mTv_car_number = (TextView) view.findViewById(R.id.tv_car_number);
+		mTv_jinji = (TextView) view.findViewById(R.id.tv_jinji);
 		mTv_baoyang = (TextView) view.findViewById(R.id.tv_baoyang);
+		mTv_baoxian = (TextView) view.findViewById(R.id.tv_baoxian);
+		mTv_zhuanjia = (TextView) view.findViewById(R.id.tv_zhuanjia);
 		OnClick onClick = new OnClick();
 		mTv_onekey.setOnClickListener(onClick);
 		mTv_check.setOnClickListener(onClick);
 		mTv_manage.setOnClickListener(onClick);
 		mTv_baoyang.setOnClickListener(onClick);
+		mTv_jinji.setOnClickListener(onClick);
+		mTv_baoxian.setOnClickListener(onClick);
+		mTv_zhuanjia.setOnClickListener(onClick);
 		try {
 			json = new JSONObject(getActivity().getIntent().getStringExtra("car"));
 		} catch (JSONException e) {
@@ -111,16 +117,22 @@ public class HomeFragment extends BaseFragment implements ITaskListener{
 				startActivity(intent1);
 				break;
 			case R.id.tv_check:
-				intent.putExtra("class", OnekeyWashFragment.class.getName());
-				startActivity(intent);
+				Intent intent2 = new Intent(getActivity(),WashMapActivity.class);
+				intent2.putExtra("type", 1);
+				startActivity(intent2);
 				break;
 			case R.id.tv_manage:
 				intent.putExtra("class", MyCarsFragment.class.getName());
 				startActivity(intent);
 				break;
-			case R.id.tv_baoyang:
-				Intent intent_bao = new Intent(getActivity(),BaoYangActivity.class);
-				startActivity(intent_bao);
+			case R.id.tv_jinji:
+				Intent intent_jin = new Intent(getActivity(),WashMapActivity.class);
+				intent_jin.putExtra("type", 2);
+				startActivity(intent_jin);
+				break;
+			case R.id.tv_baoxian:
+				break;
+			case R.id.tv_zhuanjia:
 				break;
 			}
 			
