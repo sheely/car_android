@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+　　     
+    <item
+        android:drawable="@drawable/record_animate_01"
+        android:maxLevel="600"/>
+
+　　     
+    <item
+        android:drawable="@drawable/record_animate_02"
+        android:maxLevel="1000"/>
+
+　　     
+    <item
+        android:drawable="@drawable/record_animate_03"
+        android:maxLevel="1200"/>
+
+　　     
+    <item
+        android:drawable="@drawable/record_animate_04"
+        android:maxLevel="1400"/>
+
+　　     
+    <item
+        android:drawable="@drawable/record_animate_05"
+        android:maxLevel="1600"/>
+
+　　     
+    <item
+        android:drawable="@drawable/record_animate_06"
+        android:maxLevel="1800"/>
+
+　　     
+    <item
+        android:drawable="@drawable/record_animate_07"
+        android:maxLevel="2000"/>
+    <item
+        android:drawable="@drawable/record_animate_09"
+        android:maxLevel="3000"/>
+    <item
+        android:drawable="@drawable/record_animate_10"
+        android:maxLevel="4000"/>
+    <item
+        android:drawable="@drawable/record_animate_12"
+        android:maxLevel="6000"/>
+    <item
+        android:drawable="@drawable/record_animate_13"
+        android:maxLevel="8000"/>
+    <item
+        android:drawable="@drawable/record_animate_14"
+        android:maxLevel="10000"/>
+
+</level-list>

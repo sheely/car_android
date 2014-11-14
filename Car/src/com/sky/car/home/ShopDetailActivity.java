@@ -3,22 +3,22 @@ package com.sky.car.home;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.next.intf.ITaskListener;
 import com.next.net.SHPostTaskM;
 import com.next.net.SHTask;
-import com.sky.base.BaseFragment;
 import com.sky.base.BaseNormalActivity;
-import com.sky.base.SHContainerActivity;
 import com.sky.car.R;
 import com.sky.car.util.ConfigDefinition;
 import com.sky.car.widget.SHImageView;
@@ -28,10 +28,11 @@ import com.sky.widget.SHDialog.DialogClickListener;
 public class ShopDetailActivity extends BaseNormalActivity implements ITaskListener{
 
 	private SHPostTaskM detailTask;
-	private TextView mTv_shop_name,mTv_shop_address,mTv_score;
+	private TextView mTv_shop_name,mTv_shop_address,mTv_score,mTv_money_old1,mTv_money_old2;
 	private SHImageView mIv_logo;
 	private RatingBar mRating;
 	private Button mBtn_contact,mBtn_appraise,mBtn_daohang;
+	private CheckBox mCb_normal,mCb_special,mCb_quan;
 	JSONObject json;
 //	@Override
 //	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -55,6 +56,40 @@ public class ShopDetailActivity extends BaseNormalActivity implements ITaskListe
 		mBtn_contact = (Button) findViewById(R.id.btn_contact);
 		mBtn_appraise = (Button) findViewById(R.id.btn_appraise);
 		mBtn_daohang = (Button) findViewById(R.id.btn_daohang);
+		mTv_money_old1 = (TextView) findViewById(R.id.tv_money_old1);
+		mTv_money_old2 = (TextView) findViewById(R.id.tv_money_old2);
+		mTv_money_old1.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+		mTv_money_old2.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+		mCb_normal = (CheckBox) findViewById(R.id.cb_normal);
+		mCb_special = (CheckBox) findViewById(R.id.cb_special);
+		mCb_quan = (CheckBox) findViewById(R.id.cb_quan);
+		mCb_normal.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
+				// TODO Auto-generated method stub
+				if(arg1){
+					mCb_quan.setClickable(true);
+					mCb_normal.setClickable(false);
+					mCb_special.setChecked(false);
+					mCb_special.setClickable(true);
+				}
+			}
+		});
+		mCb_special.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				// TODO Auto-generated method stub
+				if(isChecked){
+					mCb_normal.setChecked(false);
+					mCb_special.setClickable(false);
+					mCb_normal.setClickable(true);
+					mCb_quan.setChecked(false);
+					mCb_quan.setClickable(false);
+				}
+			}
+		});
 		OnClick onClick = new OnClick();
 		mBtn_contact.setOnClickListener(onClick);
 		mBtn_appraise.setOnClickListener(onClick);

@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+     <include
+        android:id="@+id/detailTitlebar"
+        layout="@layout/titlebar_detail" /> 
+
+    <GridView
+        android:id="@+id/gv_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="3"
+        android:verticalSpacing="1dp"
+        android:horizontalSpacing="5dp"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:listSelector="@drawable/list_selector"
+        android:padding="10dp"/> 
+	<TextView
+	    android:layout_width="match_parent"
+	    android:layout_height="50dp"
+	    android:textColor="@color/text_color_gray"
+	    android:textSize="@dimen/text_mid"
+	    android:text="最多添加3张照片"
+	    android:gravity="center"/>
+	
+	<Button
+	    android:id="@+id/btn_confirm"
+	    android:layout_width="match_parent"
+	    android:layout_height="40dp"
+	    android:layout_margin="10dp"
+	    android:background="@drawable/bg_blue_round_corner"
+	    android:text="确定"
+	    android:textSize="@dimen/text_big"
+	    android:textColor="@color/white"/>
+</LinearLayout>

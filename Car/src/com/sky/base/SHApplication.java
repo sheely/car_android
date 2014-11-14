@@ -17,6 +17,7 @@ import com.baidu.location.LocationClientOption.LocationMode;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.MyLocationData;
 import com.next.app.StandardApplication;
+import com.sky.car.util.SHLocationManager;
 
 public class SHApplication extends StandardApplication {
 
@@ -24,48 +25,48 @@ public class SHApplication extends StandardApplication {
 	/**
 	 * location
 	 */
-	public LocationClient mLocationClient;
-	public GeofenceClient mGeofenceClient;
-	public MyLocationListener mMyLocationListener;
-	private BDLocationListener newLocationListener;
-	private LocationMode tempMode = LocationMode.Hight_Accuracy;
-	// private MyLocationData locData;
-	// public MyLocationData getLocData() {
-	// return locData;
-	// }
-
-	private String tempcoor = "bd09ll";// 之前"gcj02"
-	private double Lng, Lat;// 经度，纬度
-	private String address;
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public double getLng() {
-		return Lng;
-	}
-
-	public void setLng(double lng) {
-		Lng = lng;
-	}
-
-	public double getLat() {
-		return Lat;
-	}
-
-	public void setLat(double lat) {
-		Lat = lat;
-	}
-
-	public void setNewLocationListener(BDLocationListener newLocationListener) {
-		this.newLocationListener = newLocationListener;
-		mLocationClient.registerLocationListener(newLocationListener);
-	}
+//	public LocationClient mLocationClient;
+//	public GeofenceClient mGeofenceClient;
+//	public MyLocationListener mMyLocationListener;
+//	private BDLocationListener newLocationListener;
+//	private LocationMode tempMode = LocationMode.Hight_Accuracy;
+//	// private MyLocationData locData;
+//	// public MyLocationData getLocData() {
+//	// return locData;
+//	// }
+//
+//	private String tempcoor = "bd09ll";// 之前"gcj02"
+//	private double Lng, Lat;// 经度，纬度
+//	private String address;
+//
+//	public String getAddress() {
+//		return address;
+//	}
+//
+//	public void setAddress(String address) {
+//		this.address = address;
+//	}
+//
+//	public double getLng() {
+//		return Lng;
+//	}
+//
+//	public void setLng(double lng) {
+//		Lng = lng;
+//	}
+//
+//	public double getLat() {
+//		return Lat;
+//	}
+//
+//	public void setLat(double lat) {
+//		Lat = lat;
+//	}
+//
+//	public void setNewLocationListener(BDLocationListener newLocationListener) {
+//		this.newLocationListener = newLocationListener;
+//		mLocationClient.registerLocationListener(newLocationListener);
+//	}
 
 	/**
 	 * 
@@ -83,18 +84,20 @@ public class SHApplication extends StandardApplication {
 
 	public void onCreate() {
 		super.onCreate();
-		mLocationClient = new LocationClient(this.getApplicationContext());
-		// LocationClientOption option = new LocationClientOption();
-		// option.setOpenGps(true);// 打开gps
-		// option.setCoorType("bd09ll"); // 设置坐标类型
-		// option.setScanSpan(10000);
-		// mLocationClient.setLocOption(option);
-		mMyLocationListener = new MyLocationListener();
-		mLocationClient.registerLocationListener(mMyLocationListener);
-		mGeofenceClient = new GeofenceClient(getApplicationContext());
-		InitLocation();
-		mLocationClient.start();// 启动定位
+		SHLocationManager.getInstance().start();
 		SDKInitializer.initialize(this);
+//		mLocationClient = new LocationClient(this.getApplicationContext());
+//		// LocationClientOption option = new LocationClientOption();
+//		// option.setOpenGps(true);// 打开gps
+//		// option.setCoorType("bd09ll"); // 设置坐标类型
+//		// option.setScanSpan(10000);
+//		// mLocationClient.setLocOption(option);
+//		mMyLocationListener = new MyLocationListener();
+//		mLocationClient.registerLocationListener(mMyLocationListener);
+//		mGeofenceClient = new GeofenceClient(getApplicationContext());
+//		InitLocation();
+//		mLocationClient.start();// 启动定位
+//		SDKInitializer.initialize(this);
 	}
 
 	public void addActivity(BaseActivity a) {
@@ -113,37 +116,37 @@ public class SHApplication extends StandardApplication {
 	/**
 	 * 实现实位回调监听
 	 */
-	public class MyLocationListener implements BDLocationListener {
+//	public class MyLocationListener implements BDLocationListener {
+//
+//		@Override
+//		public void onReceiveLocation(BDLocation location) {
+//			// Receive Location
+//			// if(location != null){
+//			setLng(location.getLongitude());
+//			setLat(location.getLatitude());
+//			setAddress(location.getAddrStr());
+//
+//			// System.out.println(location.getAddrStr());
+//			// System.out.println(getLng()+","+getLat());
+//
+//			// locData = new MyLocationData.Builder()
+//			// .accuracy(location.getRadius())
+//			// // 此处设置开发者获取到的方向信息，顺时针0-360
+//			// .direction(100).latitude(location.getLatitude())
+//			// .longitude(location.getLongitude()).build();
+//		}
+//
+//	}
 
-		@Override
-		public void onReceiveLocation(BDLocation location) {
-			// Receive Location
-			// if(location != null){
-			setLng(location.getLongitude());
-			setLat(location.getLatitude());
-			setAddress(location.getAddrStr());
-
-			// System.out.println(location.getAddrStr());
-			// System.out.println(getLng()+","+getLat());
-
-			// locData = new MyLocationData.Builder()
-			// .accuracy(location.getRadius())
-			// // 此处设置开发者获取到的方向信息，顺时针0-360
-			// .direction(100).latitude(location.getLatitude())
-			// .longitude(location.getLongitude()).build();
-		}
-
-	}
-
-	private void InitLocation() {
-		LocationClientOption option = new LocationClientOption();
-		option.setLocationMode(tempMode);// 设置定位模式
-		option.setCoorType(tempcoor);// 返回的定位结果是百度经纬度，默认值gcj02
-		int span = 5000;
-		option.setScanSpan(span);// 设置发起定位请求的间隔时间为5000ms
-		option.setIsNeedAddress(true);// 反编码地址
-		mLocationClient.setLocOption(option);
-	}
+//	private void InitLocation() {
+//		LocationClientOption option = new LocationClientOption();
+//		option.setLocationMode(tempMode);// 设置定位模式
+//		option.setCoorType(tempcoor);// 返回的定位结果是百度经纬度，默认值gcj02
+//		int span = 5000;
+//		option.setScanSpan(span);// 设置发起定位请求的间隔时间为5000ms
+//		option.setIsNeedAddress(true);// 反编码地址
+//		mLocationClient.setLocOption(option);
+//	}
 
 	/**
 	 * 

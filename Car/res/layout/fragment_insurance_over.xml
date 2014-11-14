@@ -3,9 +3,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" 
-    android:background="@color/white">
+    android:background="@color/white"
+    android:gravity="center_horizontal">
     <include
         android:id="@+id/detailTitlebar"
         layout="@layout/titlebar_detail" />
-
+	<TextView
+	    android:id="@+id/tv_des"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_margin="10dp"
+	    android:textSize="@dimen/text_mid"
+	    android:textColor="@color/text_color_gray"
+	    android:text="亲爱的客户，您的保险即将到期，我们根据您的使用习惯，推测出您的下一年保险金额区间为："/>
+	
+	<ImageView
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="50dp"
+	    android:layout_marginRight="50dp"
+	    android:layout_marginTop="40dp"
+	    android:background="@drawable/img_price"/>
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:paddingLeft="20dp"
+	    android:paddingRight="20dp"
+	    android:layout_marginTop="20dp">
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textSize="@dimen/text_mid"
+	        android:text="￥20000"
+	        android:textColor="#7bdb60"/>
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textSize="@dimen/text_mid"
+	        android:layout_alignParentRight="true"
+	        android:text="￥200000"
+	        android:textColor="#30791d"/>
+	</RelativeLayout>
+	<Button
+	    android:layout_width="match_parent"
+	    android:layout_height="40dp"
+	    android:text="我要推荐保险"
+	    android:textSize="@dimen/text_big"
+	    android:textColor="@color/white"
+	    android:gravity="center"
+	    android:background="@drawable/bg_orange_round_corner"
+	    android:layout_marginLeft="20dp"
+	    android:layout_marginRight="20dp"
+	    android:layout_marginTop="40dp"/>
 </LinearLayout>

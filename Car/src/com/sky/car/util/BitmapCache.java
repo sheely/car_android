@@ -8,20 +8,20 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 
 /**
- * 瀵瑰浘鐗囩殑缂撳瓨
+ * 对图片的缓存
  * 
  * @author demon
  * 
  */
 public class BitmapCache {
 	private static BitmapCache cache;
-	/** 鐢ㄤ簬Cache鍐呭鐨勫瓨鍌� */
+	/** 用于Cache内容的存储 */
 	private HashMap<String, BtimapRef> bitmapRefs;
-	/** 鍨冨溇Reference鐨勯槦鍒楋紙鎵�寮曠敤鐨勫璞″凡缁忚鍥炴敹锛屽垯灏嗚寮曠敤瀛樺叆闃熷垪涓級 */
+	/** 垃圾Reference的队列（所引用的对象已经被回收，则将该引用存入队列中） */
 	private ReferenceQueue<Bitmap> q;
 
 	/**
-	 * 鍒濆鍖栨搷浣�
+	 * 初始化操作
 	 */
 	private BitmapCache() {
 		bitmapRefs = new HashMap<String, BitmapCache.BtimapRef>();
@@ -29,7 +29,7 @@ public class BitmapCache {
 	}
 
 	/**
-	 * 鑾峰彇瀹炰緥
+	 * 获取实例
 	 * 
 	 * @return
 	 */
@@ -41,35 +41,35 @@ public class BitmapCache {
 	}
 
 	/**
-	 * 娣诲姞鍥剧墖鍒扮紦瀛�
+	 * 添加图片到缓存
 	 * 
 	 * @param bmp
-	 *            鍥剧墖
+	 *            图片
 	 * @param key
-	 *            鍥剧墖鍚嶇О [key]
+	 *            图片名称 [key]
 	 */
 	@SuppressLint("NewApi")
 	public void addBitmapCache(Bitmap bmp, String key) {
-		// 鑾峰彇缂撳瓨鍚嶇О
+		// 获取缓存名称
 		String name = filename(key);
-		// 娓呴櫎鐩稿悓鐨勭紦瀛�
+		// 清除相同的缓存
 		clearCache();
-		// 灏佽鏁版嵁
+		// 封装数据
 		BtimapRef ref = new BtimapRef(bmp, q, name);
 		bitmapRefs.put(name, ref);
 	}
 
 	/**
-	 * 鑾峰彇鍥剧墖
+	 * 获取图片
 	 * 
 	 * @param key
 	 * @return
 	 */
 	public Bitmap getBitmap(String url) {
-		// 鑾峰彇缂撳瓨鍚嶇О
+		// 获取缓存名称
 		String name = filename(url);
 		Bitmap bmp = null;
-		// 1.浠庣紦瀛樹腑鏌ョ湅鏄惁鏈夊浘鐗囷紝 濡傛灉 鏈変粠缂撳瓨涓彇
+		// 1.从缓存中查看是否有图片， 如果 有从缓存中取
 		if (bitmapRefs.containsKey(name)) {
 			BtimapRef bmpRef = bitmapRefs.get(name);
 			bmp = bmpRef.get();
@@ -79,7 +79,7 @@ public class BitmapCache {
 	}
 
 	/**
-	 * 鏍规嵁鍥剧墖鐨勮矾寰勮繑鍥炲悕绉�
+	 * 根据图片的路径返回名称
 	 * 
 	 * @param url
 	 * @return
@@ -89,7 +89,7 @@ public class BitmapCache {
 	}
 
 	/**
-	 * 娓呴櫎鎵�鏈夌紦瀛�
+	 * 清除所有缓存
 	 */
 	public void clearAllCache() {
 		clearCache();
@@ -99,7 +99,7 @@ public class BitmapCache {
 	}
 
 	/**
-	 * 娓呴櫎鏃犵敤鐨勭紦瀛�
+	 * 清除无用的缓存
 	 */
 	private void clearCache() {
 		BtimapRef ref = null;
@@ -109,10 +109,10 @@ public class BitmapCache {
 	}
 
 	/**
-	 * 缁ф壙SoftReference锛屼娇寰楁瘡涓�涓疄渚嬮兘鍏锋湁鍙瘑鍒殑鏍囪瘑銆�
+	 * 继承SoftReference，使得每一个实例都具有可识别的标识。
 	 */
 	private class BtimapRef extends SoftReference<Bitmap> {
-		// 鏍囪瘑key
+		// 标识key
 		private String _key = "";
 
 		public BtimapRef(Bitmap bmp, ReferenceQueue<Bitmap> q, String key) {

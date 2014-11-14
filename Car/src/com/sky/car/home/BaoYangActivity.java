@@ -25,6 +25,7 @@ import com.sky.base.BaseNormalActivity;
 import com.sky.base.SHApplication;
 import com.sky.car.R;
 import com.sky.car.util.AudioRecorder;
+import com.sky.car.util.SHLocationManager;
 import com.sky.widget.SHDialog;
 import com.sky.widget.SHDialog.DialogItemClickListener;
 import com.sky.widget.SHToast;
@@ -69,7 +70,7 @@ public class BaoYangActivity extends BaseNormalActivity {
 		super.onCreate(savedInstanceState);
 		mDetailTitlebar.setTitle("Î¬ÐÞ±£Ñø");
 		mTv_location = (TextView) findViewById(R.id.tv_location);
-		mTv_location.setText(SHApplication.getInstance().getAddress());
+		mTv_location.setText(SHLocationManager.getInstance().getAddress());
 		mRl_voice = (RelativeLayout) findViewById(R.id.rl_voice);
 		mTv_time = (TextView) findViewById(R.id.tv_time);
 		mIv_play = (ImageView) findViewById(R.id.iv_play);

@@ -1,48 +1,45 @@
 package com.sky.car.home;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Dialog;
-import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.view.Display;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import cn.sharesdk.framework.authorize.b;
 
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BaiduMap.OnMapStatusChangeListener;
 import com.baidu.mapapi.map.BaiduMap.OnMarkerClickListener;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
@@ -50,19 +47,20 @@ import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.next.intf.ITaskListener;
 import com.next.net.SHPostTaskM;
 import com.next.net.SHTask;
-import com.sky.base.BaseNormalActivity;
-import com.sky.base.SHApplication;
+import com.next.util.SHEnvironment;
+import com.sky.base.DetailTitlebar;
 import com.sky.car.R;
 import com.sky.car.util.AudioRecorder;
 import com.sky.car.util.ConfigDefinition;
-import com.sky.car.util.ImageLoaderTask;
-import com.sky.car.util.ImageTools;
+import com.sky.car.util.SHLocationManager;
 import com.sky.car.widget.SHImageView;
 import com.sky.widget.SHDialog;
-import com.sky.widget.SHDialog.DialogItemClickListener;
 import com.sky.widget.SHToast;
 
 /**
@@ -71,14 +69,16 @@ import com.sky.widget.SHToast;
  * @author skypan
  * 
  */
-public class WashMapActivity extends BaseNormalActivity implements ITaskListener {
+public class WashMapActivity extends FragmentActivity implements ITaskListener {
 
 	private MapView mMapView;
 	private BaiduMap mBaiduMap;
 	private TextView mTv_location;
 	private Marker mMarkerShop;// 当前位置标记
+	private Marker mCenterMarker;
 	JSONArray jsonArray = null;
 	private LinearLayout mLl_bottom_check, mLl_bottom_say;
+	private ImageView iv_zhuanjia;
 	private int type;// 0：一键洗车 1：一键检测 2：紧急援助 3：保养维修 4：保险 5：专家解疑
 	private SHPostTaskM shanghuTask;
 	private Button mBtn_say;
@@ -91,7 +91,7 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 	public static final int PHOTOZOOM = 2; // 缩放
 	public static final int PHOTORESOULT = 3;// 结果
 	public static final String IMAGE_UNSPECIFIED = "image/*";
-	private static final int SCALE = 20;//照片缩小比例
+	private static final int SCALE = 6;//照片缩小比例
 	/**
 	 * 录音
 	 */
@@ -100,7 +100,8 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 	private static final int RECORD_ON = 1; // 正在录音
 	private static final String RECORD_FILENAME = "record0033"; // 录音文件名
 	private TextView mTvRecordDialogTxt;
-	private ImageView mIvRecVolume;
+	private static ImageView mIvRecVolume;
+	private ImageView mIv_voice_Image;
 
 	private Dialog mRecordDialog;
 	private AudioRecorder mAudioRecorder;
@@ -108,77 +109,163 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 	private Thread mRecordThread;
 
 	private int recordState = 0; // 录音状态
-	private float recodeTime = 0.0f; // 录音时长
+	public float recodeTime = 0.0f; // 录音时长
 	private double voiceValue = 0.0; // 录音的音量值
 	private boolean playState = false; // 录音的播放状态
 	private boolean moveState = false; // 手指是否移动
 
 	private float downY;
-	private Dialog dialog;
-	private ImageView iv_photo1,iv_photo2,iv_photo3;
-	private RelativeLayout rl_photo1,rl_photo2,rl_photo3;
-	private ArrayList<Bitmap> bitList = new ArrayList<Bitmap>();
-
+	private DetailTitlebar mDetailTitlebar;
+	private ReleaseFragment releaseFragment;
+	OverlayOptions ooCurrent;
+	private Handler volumeHandler;
+	private Button mBtn_keyboard;
+	private EditText mEt_content;
+	private boolean flag = true;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		setContentView(R.layout.fragment_wash_map);
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.fragment_wash_map);
+		volumeHandler = new ShowVolumeHandler();
+		mDetailTitlebar = (DetailTitlebar) findViewById(R.id.detailTitlebar);
+		mDetailTitlebar.setLeftButton(R.drawable.ic_back, new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				finish();
+			}
+		});
 		type = getIntent().getIntExtra("type", 0);
+		mDetailTitlebar.setRightButton(R.drawable.ic_list, new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(type == 0){
+					finish();
+				}else{
+					Intent intent = new Intent(WashMapActivity.this,OneKeyWashActivity.class);
+					intent.putExtra("type", type);
+					startActivity(intent);
+				}
+			}
+		});
+//		ll_bottom = (LinearLayout) findViewById(R.id.ll_bottom);
+//		rl_photo1 = (RelativeLayout) findViewById(R.id.rl_photo1);
+//		iv_photo1 = (ImageView) findViewById(R.id.iv_photo1);
+//		iv_add_photo = (ImageView) findViewById(R.id.iv_add_image);
+//		iv_add_photo.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				// TODO Auto-generated method stub
+//				Intent it_local = new Intent(Intent.ACTION_GET_CONTENT, null);
+//				it_local.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+//				startActivityForResult(it_local, 0);
+//			}
+//		});
+		iv_zhuanjia = (ImageView) findViewById(R.id.iv_zhuanjia);
 		mLl_bottom_check = (LinearLayout) findViewById(R.id.ll_bottom_check);
 		mLl_bottom_say = (LinearLayout) findViewById(R.id.ll_bottom_say);
+		mMapView = (MapView) findViewById(R.id.bmapView);
+		mEt_content = (EditText) findViewById(R.id.et_content);
+		mEt_content.setOnKeyListener(new OnKeyListener() {
+			
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				// TODO Auto-generated method stub
+				if (v == mEt_content && keyCode == KeyEvent.KEYCODE_ENTER
+						&& event.getAction() == KeyEvent.ACTION_UP) {
+					if(mEt_content.getText().toString().trim().length() <= 0){
+						SHToast.showToast(WashMapActivity.this, "描述内容不能为空", 1000);
+					}else{
+						Bundle b = new Bundle();
+						b.putString("content", mEt_content.getText().toString().trim());
+						showFragment(b);
+						InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE); 
+						imm.hideSoftInputFromWindow(mEt_content.getWindowToken(), 0); //强制隐藏键盘
+					}
+					return true;
+				}
+				return false;
+			}
+		});
+		mBtn_keyboard = (Button) findViewById(R.id.btn_keyboard);
+		mBtn_keyboard.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				if(flag){
+					mBtn_say.setVisibility(View.GONE);
+					mEt_content.setVisibility(View.VISIBLE);
+					flag = false;
+				}else{
+					mEt_content.setVisibility(View.GONE);
+					mBtn_say.setVisibility(View.VISIBLE);
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE); 
+					imm.hideSoftInputFromWindow(mEt_content.getWindowToken(), 0); //强制隐藏键盘
+					flag = true;
+				}
+			}
+		});
 		mBtn_say = (Button) findViewById(R.id.btn_say);
 		switch (type) {
 		case 0:
 			mDetailTitlebar.setTitle("洗车地图");
-			requestShop();
-			// try {
-			// jsonArray = new
-			// JSONArray(getIntent().getStringExtra("jsonArray"));
-			// } catch (JSONException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
+			requestShop(SHLocationManager.getInstance().getLat(),SHLocationManager.getInstance().getLng());
 			break;
 		case 1:
 			mDetailTitlebar.setTitle("一键检测");
 			mLl_bottom_check.setVisibility(View.VISIBLE);
-			requestShop();
+			requestShop(SHLocationManager.getInstance().getLat(),SHLocationManager.getInstance().getLng());
 			break;
 		case 2:
 			mDetailTitlebar.setTitle("紧急援助");
 			mLl_bottom_say.setVisibility(View.VISIBLE);
-			requestShop();
+			requestShop(SHLocationManager.getInstance().getLat(),SHLocationManager.getInstance().getLng());
 			break;
 		case 3:
 			mDetailTitlebar.setTitle("保养维修");
-			requestShop();
+			mLl_bottom_say.setVisibility(View.VISIBLE);
+			requestShop(SHLocationManager.getInstance().getLat(),SHLocationManager.getInstance().getLng());
 			break;
 		case 4:
 			mDetailTitlebar.setTitle("保险");
-			requestShop();
+			mLl_bottom_say.setVisibility(View.VISIBLE);
+			requestShop(SHLocationManager.getInstance().getLat(),SHLocationManager.getInstance().getLng());
 			break;
 		case 5:
 			mDetailTitlebar.setTitle("专家解疑");
+			mLl_bottom_say.setVisibility(View.VISIBLE);
+			mMapView.setVisibility(View.GONE);
+			iv_zhuanjia.setVisibility(View.VISIBLE);
 			break;
 		}
 
 		mTv_location = (TextView) findViewById(R.id.tv_location);
-		mTv_location.setText("当前位置:" + SHApplication.getInstance().getAddress());
-		mMapView = (MapView) findViewById(R.id.bmapView);
+		mTv_location.setText("当前位置:" + SHLocationManager.getInstance().getAddress());
 		mBaiduMap = mMapView.getMap();
 		MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(14.0f);
 		mBaiduMap.setMapStatus(msu);
+//		mBaiduMap.setMyLocationEnabled(true);
 		initOverlay();
-		setListener();
+//		setListener();
 	}
 
-	private void requestShop() {
+	private void requestShop(double lat,double lng) {
+//		SHDialog.ShowProgressDiaolg(this, null);
+		if(shanghuTask != null){
+			shanghuTask.cancel(true);
+		}
 		shanghuTask = new SHPostTaskM();
 		shanghuTask.setUrl(ConfigDefinition.URL + "shopquery.action");
 		shanghuTask.setListener(this);
-		shanghuTask.getTaskArgs().put("lat", SHApplication.getInstance().getLat());
-		shanghuTask.getTaskArgs().put("lgt", SHApplication.getInstance().getLng());
+		shanghuTask.getTaskArgs().put("lat", lat);
+		shanghuTask.getTaskArgs().put("lgt", lng);
 		shanghuTask.getTaskArgs().put("maptype", 0);
 		shanghuTask.getTaskArgs().put("opertype", 0);
 		shanghuTask.getTaskArgs().put("pageno", 1);
@@ -224,30 +311,14 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 		shanghuTask.start();
 	}
 
-	// @Override
-	// public void onViewCreated(View view, Bundle savedInstanceState) {
-	// // TODO Auto-generated method stub
-	// super.onViewCreated(view, savedInstanceState);
-	// mDetailTitlebar.setTitle("洗车地图");
-	//
-	// }
-
-	// @Override
-	// public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	// Bundle savedInstanceState) {
-	// // TODO Auto-generated method stub
-	// View view = inflater.inflate(R.layout.fragment_wash_map, container,
-	// false);
-	// return view;
-	// }
 
 	public void initOverlay() {
 		// add marker overlay
-		LatLng currentLatLng = new LatLng(SHApplication.getInstance().getLat(), SHApplication.getInstance().getLng());
+		LatLng currentLatLng = new LatLng(SHLocationManager.getInstance().getLat(), SHLocationManager.getInstance().getLng());
 		MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(currentLatLng);
 		mBaiduMap.animateMapStatus(u);// 定位到当前位置
-		OverlayOptions ooCurrent = new MarkerOptions().position(currentLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_gcoding)).zIndex(5);
-		mBaiduMap.addOverlay(ooCurrent);// 当前位置图标
+		ooCurrent = new MarkerOptions().position(currentLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_gcoding)).zIndex(5);
+		mCenterMarker = (Marker) mBaiduMap.addOverlay(ooCurrent);// 当前位置图标
 		addOverlay();
 	}
 
@@ -258,27 +329,29 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 			View view = LayoutInflater.from(this).inflate(R.layout.popup_map, null);
 			TextView tv_shop_name = (TextView) view.findViewById(R.id.tv_shop_name);
 			TextView tv_shop_address = (TextView) view.findViewById(R.id.tv_shop_address);
+			SHImageView iv_shop = (SHImageView) view.findViewById(R.id.iv_shop);
 			RatingBar rating = (RatingBar) view.findViewById(R.id.rating);
 
 			for (int i = 0; i < jsonArray.length(); i++) {
-				SHImageView iv_shop = (SHImageView) view.findViewById(R.id.iv_shop);
 				LatLng point = null;
 				try {
 					point = new LatLng(jsonArray.getJSONObject(i).optJSONObject("baidulatitude").optDouble("lat"), jsonArray.getJSONObject(i).optJSONObject("baidulatitude").optDouble("lgt"));
 					tv_shop_name.setText(jsonArray.getJSONObject(i).optString("shopname"));
 					tv_shop_address.setText(jsonArray.getJSONObject(i).optString("shopaddress"));
 					rating.setRating(Float.valueOf(jsonArray.getJSONObject(i).optString("shopscore").toString()));
-					// iv_shop.setNewImgForImageSrc(true);
-					// iv_shop.setBackgroundDrawable(getActivity().getResources().getDrawable(R.drawable.dashboard_fault));
-//					iv_shop.setURL("http://www.baidu.com/img/bd_logo1.png");
+					iv_shop.setNewImgForImageSrc(true);
+//					 iv_shop.setBackgroundDrawable(getResources().getDrawable(R.drawable.dashboard_fault));
+					iv_shop.setURL("http://www.baidu.com/img/bd_logo1.png");
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
 				ooShop = new MarkerOptions().position(point).icon(BitmapDescriptorFactory.fromView(view)).zIndex(i);
 				mMarkerShop = (Marker) (mBaiduMap.addOverlay(ooShop));
 			}
+		}
+		if(type != 2){
+			setListener();
 		}
 	}
 
@@ -290,6 +363,7 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(WashMapActivity.this, ShopDetailActivity.class);
 				try {
+					System.out.println(marker.getZIndex());
 					intent.putExtra("shopid", jsonArray.getJSONObject(marker.getZIndex()).optString("shopid"));
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -300,6 +374,32 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 			}
 		});
 
+		mBaiduMap.setOnMapStatusChangeListener(new OnMapStatusChangeListener() {
+			
+			@Override
+			public void onMapStatusChangeStart(MapStatus arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onMapStatusChangeFinish(MapStatus arg0) {
+				// TODO Auto-generated method stub
+				mBaiduMap.clear();//先清除所有的覆盖
+				SHLocationManager.getInstance().reverseGeoCode(arg0.target);
+				mCenterMarker.remove();
+				ooCurrent = new MarkerOptions().position(arg0.target).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_gcoding)).zIndex(5);
+				mCenterMarker = (Marker) mBaiduMap.addOverlay(ooCurrent);// 当前位置图标
+				requestShop(arg0.target.latitude,arg0.target.longitude);
+			}
+			
+			@Override
+			public void onMapStatusChange(MapStatus arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		mBtn_say.setOnTouchListener(new OnTouchListener() {
 
 			@Override
@@ -348,25 +448,11 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 
 						if (!moveState) {
 							if (recodeTime < MIN_RECORD_TIME) {
-								// mRl_voice.setVisibility(View.GONE);
 								deleteOldFile();
 								SHToast.showToast(WashMapActivity.this, "录音时间太短", SHToast.LENGTH_SHORT);
 							} else {
 								// 录音完成之后...
-								showDialog();
-								// mRl_voice.setVisibility(View.VISIBLE);
-								// mIv_play.setVisibility(View.VISIBLE);
-								// mTv_playing.setVisibility(View.INVISIBLE);
-								// mTv_time.setText(((int) recodeTime) + "\"");
-								// new Handler().post(new Runnable() {
-								//
-								// @Override
-								// public void run() {
-								// // TODO Auto-generated method stub
-								// ((ScrollView)
-								// findViewById(R.id.sv)).fullScroll(ScrollView.FOCUS_DOWN);
-								// }
-								// });
+								showFragment(null);
 							}
 						} else {
 							deleteOldFile();
@@ -378,12 +464,47 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 				return false;
 			}
 		});
+		
+		SHLocationManager.getInstance().setReverseGeoListener(new OnGetGeoCoderResultListener() {
+			
+			@Override
+			public void onGetReverseGeoCodeResult(ReverseGeoCodeResult arg0) {
+				// TODO Auto-generated method stub
+				mTv_location.setText("当前位置:" + arg0.getAddress());
+			}
+			
+			@Override
+			public void onGetGeoCodeResult(GeoCodeResult arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 
+	private void showFragment(Bundle b){
+		FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
+		fragmentTransaction.setCustomAnimations(R.anim.anim_translate_up_from_bottom,R.anim.anim_translate_down_to_bottom);
+		if(releaseFragment == null){
+			releaseFragment = new ReleaseFragment();
+			if(b != null){
+				System.out.println("not null...");
+				releaseFragment.setArguments(b);
+			}
+			fragmentTransaction.replace(R.id.frame_container, releaseFragment);
+		}else{
+			fragmentTransaction.remove(releaseFragment);
+			releaseFragment = null;
+		}
+		fragmentTransaction.commit();
+	}
+	
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
+		SHLocationManager.getInstance().stop();
 		mMapView.onDestroy();
+		mMapView = null;
+		SHLocationManager.getInstance().destroyGeo();
 		super.onDestroy();
 	}
 
@@ -406,7 +527,6 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 		System.out.println(Environment.getExternalStorageDirectory());
 		File file = new File(Environment.getExternalStorageDirectory(), "/car/voiceRecord/" + RECORD_FILENAME + ".amr");
 		if (file.exists()) {
-			System.out.println("exist........");
 			file.getAbsoluteFile().delete();
 		}
 	}
@@ -419,16 +539,17 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 			mRecordDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			mRecordDialog.setContentView(R.layout.dialog_record);
 			mIvRecVolume = (ImageView) mRecordDialog.findViewById(R.id.record_dialog_img);
+//			mIv_voice_Image = 
 			mTvRecordDialogTxt = (TextView) mRecordDialog.findViewById(R.id.record_dialog_txt);
 		}
 		switch (flag) {
 		case 1:
-			mIvRecVolume.setImageResource(R.drawable.img_talk);
+//			mIvRecVolume.setImageDrawable(getResources().getDrawable(R.drawable.img_talk_null));
+			mIvRecVolume.setImageResource(R.drawable.img_talk_null);
 			mTvRecordDialogTxt.setText("松开手指可取消录音");
 			break;
 
 		default:
-			mIvRecVolume.setImageResource(R.drawable.img_talk);
 			mTvRecordDialogTxt.setText("向上滑动可取消录音");
 			break;
 		}
@@ -461,12 +582,40 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 				// } else
 				{
 					try {
-						Thread.sleep(150);
-						recodeTime += 0.15;
+						Thread.sleep(200);
+						recodeTime += 0.20;
 						// 获取音量，更新dialog
 						if (!moveState) {
 							voiceValue = mAudioRecorder.getAmplitude();
-							// recordHandler.sendEmptyMessage(1);
+							if(voiceValue < 600.0){
+								volumeHandler.sendEmptyMessage(0);
+							}else if(voiceValue < 1000.0){
+								volumeHandler.sendEmptyMessage(1);
+							}else if(voiceValue < 1200.0){
+								volumeHandler.sendEmptyMessage(2);
+							}else if(voiceValue < 1400.0){
+								volumeHandler.sendEmptyMessage(3);
+							}else if(voiceValue < 1600.0){
+								volumeHandler.sendEmptyMessage(4);
+							}else if(voiceValue < 1800.0){
+								volumeHandler.sendEmptyMessage(5);
+							}else if(voiceValue < 2000.0){
+								volumeHandler.sendEmptyMessage(6);
+							}else if(voiceValue < 3000.0){
+								volumeHandler.sendEmptyMessage(7);
+							}else if(voiceValue < 4000.0){
+								volumeHandler.sendEmptyMessage(8);
+							}else if(voiceValue < 6000.0){
+								volumeHandler.sendEmptyMessage(9);
+							}else if(voiceValue < 8000.0){
+								volumeHandler.sendEmptyMessage(10);
+							}else if(voiceValue < 10000.0){
+								volumeHandler.sendEmptyMessage(11);
+							}else if(voiceValue < 12000.0){
+								volumeHandler.sendEmptyMessage(12);
+							}else{
+								volumeHandler.sendEmptyMessage(13);
+							}
 						}
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -475,178 +624,18 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 			}
 		}
 	};
-
-	private void showDialog() {
-		dialog = new Dialog(this, R.style.OptionDialog);
-		dialog.setContentView(R.layout.dialog_map);
-		setDialogListener();
-		/**
-		 * 设置位置
-		 */
-		WindowManager windowManager = (WindowManager) this.getSystemService(this.WINDOW_SERVICE);
-		Display display = windowManager.getDefaultDisplay();
-		WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
-		lp.width = (display.getWidth()); // 设置宽度
-		lp.x = 0;
-		lp.y = display.getHeight();
-		dialog.getWindow().setAttributes(lp);
-		dialog.show();
-	}
-
-	private void setDialogListener() {
-		if (dialog != null) {
-			iv_photo1 = (ImageView) dialog.findViewById(R.id.iv_photo1);
-			iv_photo2 = (ImageView) dialog.findViewById(R.id.iv_photo2);
-			iv_photo3 = (ImageView) dialog.findViewById(R.id.iv_photo3);
-			ImageView iv_delete1 = (ImageView) dialog.findViewById(R.id.iv_delete1);
-			ImageView iv_delete2 = (ImageView) dialog.findViewById(R.id.iv_delete2);
-			ImageView iv_delete3 = (ImageView) dialog.findViewById(R.id.iv_delete3);
-			rl_photo1 = (RelativeLayout) dialog.findViewById(R.id.rl_photo1);
-			rl_photo2 = (RelativeLayout) dialog.findViewById(R.id.rl_photo2);
-			rl_photo3 = (RelativeLayout) dialog.findViewById(R.id.rl_photo3);
-			iv_delete1.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					bitList.remove(0);
-					rl_photo1.setVisibility(View.GONE);
-				}
-			});
-			TextView tv_time = (TextView) dialog.findViewById(R.id.tv_time);
-			tv_time.setText(((int) recodeTime)+"\"");
-			RelativeLayout rl_play = (RelativeLayout) dialog.findViewById(R.id.rl_play);
-			rl_play.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					if (!playState) {
-						mMediaPlayer = new MediaPlayer();
-						try {
-							mMediaPlayer.setDataSource(getAmrPath());
-							mMediaPlayer.prepare();
-							playState = true;
-							mMediaPlayer.start();
-
-							// 设置播放结束时监听
-							mMediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-
-								@Override
-								public void onCompletion(MediaPlayer mp) {
-									if (playState) {
-										playState = false;
-									}
-								}
-							});
-						} catch (IllegalArgumentException e) {
-							e.printStackTrace();
-						} catch (IllegalStateException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-
-					}
-				}
-			});
-			ImageView iv_add_image = (ImageView) dialog.findViewById(R.id.iv_add_image);
-			iv_add_image.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					if(bitList.size() == 3){
-						SHToast.showToast(WashMapActivity.this, "最多上传3张照片", 1000);
-						return;
-					}
-					final String[] items = new String[]{"拍照","相册"};
-					SHDialog.showActionSheet(WashMapActivity.this, "选择照片方式", items, new DialogItemClickListener() {
-						
-						@Override
-						public void onSelected(String result) {
-							// TODO Auto-generated method stub
-							if(items[0].equals(result)){
-								
-							}else{
-								Intent it_local = new Intent(Intent.ACTION_GET_CONTENT, null);
-								it_local.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, IMAGE_UNSPECIFIED);
-								startActivityForResult(it_local, PHOTOZOOM);
-							}
-						}
-					});
-				}
-			});
-			Button btn_submit = (Button) dialog.findViewById(R.id.btn_submit);
-			btn_submit.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					dialog.dismiss();
-					SHDialog.showOneKeyDialog(WashMapActivity.this, "需求发布成功", null);
-				}
-			});
-		}
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
-		if(data != null){
-			switch(requestCode){
-			case PHOTOZOOM:
-//				Bitmap bitmap = null;
-//				try {
-//					bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
-//				} catch (FileNotFoundException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				
-//				if(iv_photo1 != null){
-////					Bitmap b = comp(bitmap);
-//					bitmap = ThumbnailUtils.extractThumbnail(comp(bitmap), 80, 108);
-//					bitmap.recycle();
-////					bitmap = bitmap.createScaledBitmap(bitmap, 80, 100, true);
-////					bitmap = getBitmapByBytes(bitmap);
-////					bitmap.compress(Bitmap.CompressFormat.PNG, 30, stream);// (0 - 100)压缩文件 
-//					iv_photo1.setImageBitmap(bitmap);
-//				}
-				ContentResolver resolver = getContentResolver();
-				//照片的原始资源地址
-				Uri originalUri = data.getData(); 
-//				new ImageLoaderTask(this,iv_photo1).execute(originalUri);
-	            try {
-	            	//使用ContentProvider通过URI获取原始图片
-					Bitmap photo = MediaStore.Images.Media.getBitmap(resolver, originalUri);
-					
-					if (photo != null) {
-						//为防止原始图片过大导致内存溢出，这里先缩小原图显示，然后释放原始Bitmap占用的内存
-						Bitmap smallBitmap = ImageTools.zoomBitmap(photo, photo.getWidth() / SCALE, photo.getHeight() / SCALE);
-						//释放原始图片占用的内存，防止out of memory异常发生
-						photo.recycle();
-						rl_photo1.setVisibility(View.VISIBLE);
-						iv_photo1.setImageBitmap(smallBitmap);
-						bitList.add(smallBitmap);
-					}
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}  
-//				startPhotoZoom(data.getData());
-				break;
-			case PHOTORESOULT:
-				Bitmap photo = data.getExtras().getParcelable("data");
-				iv_photo1.setImageBitmap(photo);
-				break;
+	private static int[] res_volumn = { R.drawable.record_animate_01, R.drawable.record_animate_02,
+		R.drawable.record_animate_03,R.drawable.record_animate_04,R.drawable.record_animate_05,R.drawable.record_animate_06,R.drawable.record_animate_07,R.drawable.record_animate_08,R.drawable.record_animate_09,R.drawable.record_animate_10,R.drawable.record_animate_11,R.drawable.record_animate_12,R.drawable.record_animate_13,R.drawable.record_animate_14};
+	    
+	    static class ShowVolumeHandler extends Handler {
+			@Override
+			public void handleMessage(Message msg) {
+				System.out.println(msg.what);
+				mIvRecVolume.setImageResource(res_volumn[msg.what]);
 			}
 		}
-	}
+	    
+
 
 	/**
 	 * 缩放裁剪图片
@@ -668,95 +657,6 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 		startActivityForResult(intent, PHOTORESOULT);
 	}
 	
-//	private Bitmap comp(Bitmap image) {  
-//	      
-//	    ByteArrayOutputStream baos = new ByteArrayOutputStream();         
-//	    image.compress(Bitmap.CompressFormat.JPEG, 100, baos);  
-//	    if( baos.toByteArray().length / 1024>1024) {//判断如果图片大于1M,进行压缩避免在生成图片（BitmapFactory.decodeStream）时溢出    
-////	    	System.out.println("M:"+ baos.toByteArray().length/1024);
-//	        baos.reset();//重置baos即清空baos  
-//	        image.compress(Bitmap.CompressFormat.JPEG, 40, baos);//这里压缩50%，把压缩后的数据存放到baos中  
-//	    }  
-//	    if(!image.isRecycled()){
-//	    	image.recycle();
-//	    }
-//	    ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());  
-//	    BitmapFactory.Options newOpts = new BitmapFactory.Options();  
-//	    //开始读入图片，此时把options.inJustDecodeBounds 设回true了  
-//	    newOpts.inJustDecodeBounds = true;  
-//	    newOpts.inPreferredConfig = Config.RGB_565;
-//	    Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, newOpts);  
-//	    newOpts.inJustDecodeBounds = false;  
-//	    int w = newOpts.outWidth;  
-//	    int h = newOpts.outHeight;  
-//	    //现在主流手机比较多是800*480分辨率，所以高和宽我们设置为  
-//	    float hh = 800f;//这里设置高度为800f  
-//	    float ww = 480f;//这里设置宽度为480f  
-//	    //缩放比。由于是固定比例缩放，只用高或者宽其中一个数据进行计算即可  
-//	    int be = 1;//be=1表示不缩放  
-//	    if (w > h && w > ww) {//如果宽度大的话根据宽度固定大小缩放  
-//	        be = (int) (newOpts.outWidth / ww);  
-//	    } else if (w < h && h > hh) {//如果高度高的话根据宽度固定大小缩放  
-//	        be = (int) (newOpts.outHeight / hh);  
-//	    }  
-//	    if (be <= 0)  
-//	        be = 1;  
-//	    newOpts.inSampleSize = be;//设置缩放比例  
-//	    //重新读入图片，注意此时已经把options.inJustDecodeBounds 设回false了  
-//	    isBm = new ByteArrayInputStream(baos.toByteArray());  
-//	    bitmap = BitmapFactory.decodeStream(isBm, null, newOpts);  
-////	    return compressImage(bitmap);//压缩好比例大小后再进行质量压缩  
-//	    return bitmap;
-//	}
-	
-//    private Bitmap compressImage(Bitmap image) {  
-//        
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();  
-//        image.compress(Bitmap.CompressFormat.JPEG, 90, baos);//质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中  
-//        int options = 90;  
-//        
-//        while ( baos.toByteArray().length / 1024>100 && options > 10) {  //循环判断如果压缩后图片是否大于100kb,大于继续压缩         
-////        	System.out.println(baos.toByteArray().length / 1024);
-//            baos.reset();//重置baos即清空baos  
-//            options -= 10;//每次都减少10  
-//            image.compress(Bitmap.CompressFormat.JPEG, options, baos);//这里压缩options%，把压缩后的数据存放到baos中  
-//        }  
-//        if(!image.isRecycled()){
-//	    	image.recycle();
-//	    }
-//        ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());//把压缩后的数据baos存放到ByteArrayInputStream中  
-//        Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, null);//把ByteArrayInputStream数据生成图片  
-//        return bitmap;  
-//    }  
-	
-//    public static Bitmap getBitmapByBytes(Bitmap bit){  
-//    	 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//    	 bit.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//         byte[] bytes = baos.toByteArray();
-//        //对于图片的二次采样,主要得到图片的宽与高  
-//        int width = 0;  
-//        int height = 0;  
-//        int sampleSize = 1; //默认缩放为1  
-//        BitmapFactory.Options options = new BitmapFactory.Options();  
-//        options.inJustDecodeBounds = true;  //仅仅解码边缘区域  
-//        //如果指定了inJustDecodeBounds，decodeByteArray将返回为空  
-//        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);  
-//        //得到宽与高  
-//        height = options.outHeight;  
-//        width = options.outWidth;  
-//      
-//        //图片实际的宽与高，根据默认最大大小值，得到图片实际的缩放比例  
-//        while ((height / sampleSize > 300)  
-//                || (width / sampleSize > 150)) {  
-//            sampleSize *= 2;  
-//        }  
-//      
-//        //不再只加载图片实际边缘  
-//        options.inJustDecodeBounds = false;  
-//        //并且制定缩放比例  
-//        options.inSampleSize = sampleSize;  
-//        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);  
-//    }  
     
 	@Override
 	public void onTaskFinished(SHTask task) throws Exception {
@@ -784,5 +684,22 @@ public class WashMapActivity extends BaseNormalActivity implements ITaskListener
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		super.onSaveInstanceState(outState);
+		outState.putString("username", SHEnvironment.getInstance().getLoginID());
+		outState.putString("password", SHEnvironment.getInstance().getPassword());
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onRestoreInstanceState(savedInstanceState);
+		SHEnvironment.getInstance().setLoginId(savedInstanceState.getString("username"));
+		SHEnvironment.getInstance().setPassword(savedInstanceState.getString("password"));
+	}
+
 
 }

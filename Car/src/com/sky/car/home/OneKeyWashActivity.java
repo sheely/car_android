@@ -12,21 +12,21 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView.OnEditorActionListener;
 
 import com.next.intf.ITaskListener;
 import com.next.net.SHPostTaskM;
 import com.next.net.SHTask;
 import com.sky.base.BaseNormalActivity;
-import com.sky.base.SHApplication;
-import com.sky.base.SHContainerActivity;
 import com.sky.car.R;
 import com.sky.car.adapter.ShopAdapter;
 import com.sky.car.util.ConfigDefinition;
+import com.sky.car.util.SHLocationManager;
 import com.sky.car.widget.SHListView;
+import com.sky.car.widget.SHListView.OnLoadMoreListener;
 import com.sky.car.widget.SHListView.OnRefreshListener;
 import com.sky.widget.SHDialog;
 
@@ -38,6 +38,8 @@ public class OneKeyWashActivity extends BaseNormalActivity implements ITaskListe
 	private EditText mEt_keyword;
 	ShopAdapter adapter;
 	JSONArray jsonArray;
+	private int currentPage = 1;
+	private int type = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,15 +47,34 @@ public class OneKeyWashActivity extends BaseNormalActivity implements ITaskListe
 		setContentView(R.layout.fragment_onekey_wash);
 		super.onCreate(savedInstanceState);
 		mDetailTitlebar.setTitle("商户");
+		type = getIntent().getIntExtra("type", 0);
+		switch (type) {
+		case 0:
+			mDetailTitlebar.setTitle("商户");
+			break;
+		case 1:
+			mDetailTitlebar.setTitle("一键检测");
+			break;
+		case 2:
+			mDetailTitlebar.setTitle("紧急援助");
+			break;
+		case 3:
+			mDetailTitlebar.setTitle("保养维修");
+			break;
+		}
 		mDetailTitlebar.setRightButton(R.drawable.icon_map, new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(OneKeyWashActivity.this, WashMapActivity.class);
-				intent.putExtra("jsonArray", jsonArray.toString());
-				intent.putExtra("type", 0);//0:一键洗车
-				startActivity(intent);
+				if(type == 0){
+					Intent intent = new Intent(OneKeyWashActivity.this, WashMapActivity.class);
+					intent.putExtra("jsonArray", jsonArray.toString());
+					intent.putExtra("type", 0);//0:一键洗车
+					startActivity(intent);
+				}else{
+					finish();
+				}
 			}
 		});
 		mLv_shop = (SHListView) findViewById(R.id.lv_shop);
@@ -71,19 +92,6 @@ public class OneKeyWashActivity extends BaseNormalActivity implements ITaskListe
 				return true;
 			}
 		});
-		// mEt_keyword.setOnKeyListener(new OnKeyListener() {
-		//
-		// @Override
-		// public boolean onKey(View v, int keyCode, KeyEvent event) {
-		// // TODO Auto-generated method stub
-		// if(keyCode==KeyEvent.KEYCODE_ENTER){
-		// System.out.println("fu:"+mEt_keyword.getText().toString().trim());
-		// SHDialog.ShowProgressDiaolg(getActivity(), null);
-		// requestShangHu();
-		// }
-		// return false;
-		// }
-		// });
 		mLv_shop.setCanLoadMore(true);
 		mLv_shop.setCanRefresh(true);
 		mLv_shop.setAutoLoadMore(true);
@@ -96,27 +104,40 @@ public class OneKeyWashActivity extends BaseNormalActivity implements ITaskListe
 			@Override
 			public void onRefresh() {
 				// TODO Auto-generated method stub
+				currentPage = 1;
 				requestShangHu();
 				mLv_shop.setDoRefreshOnUIChanged(false);
 			}
 		});
-		// requestShangHu();
-		mLv_shop.setOnItemClickListener(new OnItemClickListener() {
-
+		mLv_shop.setOnLoadListener(new OnLoadMoreListener() {
+			
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			public void onLoadMore() {
 				// TODO Auto-generated method stub
-				// System.out.println("position:"+position);
-				Intent intent = new Intent(OneKeyWashActivity.this, ShopDetailActivity.class);
-				try {
-					intent.putExtra("shopid", jsonArray.getJSONObject(position - 1).getString("shopid"));
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				startActivity(intent);
+				currentPage ++;
+				requestShangHu();
 			}
 		});
+		// requestShangHu();
+		if(type != 2){
+			mLv_shop.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					// TODO Auto-generated method stub
+					// System.out.println("position:"+position);
+					Intent intent = new Intent(OneKeyWashActivity.this, ShopDetailActivity.class);
+					try {
+						intent.putExtra("shopid", jsonArray.getJSONObject(position - 1).getString("shopid"));
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					startActivity(intent);
+				}
+			});
+		}
+		
 	}
 
 	private void requestShangHu() {
@@ -124,18 +145,50 @@ public class OneKeyWashActivity extends BaseNormalActivity implements ITaskListe
 		shanghuTask = new SHPostTaskM();
 		shanghuTask.setUrl(ConfigDefinition.URL + "shopquery.action");
 		shanghuTask.setListener(this);
-		shanghuTask.getTaskArgs().put("lat", SHApplication.getInstance().getLat());
-		shanghuTask.getTaskArgs().put("lgt", SHApplication.getInstance().getLng());
+		shanghuTask.getTaskArgs().put("lat", SHLocationManager.getInstance().getLat());
+		shanghuTask.getTaskArgs().put("lgt", SHLocationManager.getInstance().getLng());
 		shanghuTask.getTaskArgs().put("keyname", mEt_keyword.getText().toString().trim());
 		shanghuTask.getTaskArgs().put("maptype", 0);
 		shanghuTask.getTaskArgs().put("opertype", 0);
-		shanghuTask.getTaskArgs().put("pageno", 1);
-		shanghuTask.getTaskArgs().put("pagesize", 20);
-		shanghuTask.getTaskArgs().put("ishaswash", 1);
-		shanghuTask.getTaskArgs().put("ishascheck", 0);
-		shanghuTask.getTaskArgs().put("ishasmaintainance", 0);
-		shanghuTask.getTaskArgs().put("ishasurgentrescure", 0);
-		shanghuTask.getTaskArgs().put("ishassellinsurance", 0);
+		shanghuTask.getTaskArgs().put("pageno", currentPage);
+		shanghuTask.getTaskArgs().put("pagesize", 2);
+		switch (type) {
+		case 0:
+			shanghuTask.getTaskArgs().put("ishaswash", 1);
+			shanghuTask.getTaskArgs().put("ishascheck", 0);
+			shanghuTask.getTaskArgs().put("ishasmaintainance", 0);
+			shanghuTask.getTaskArgs().put("ishasurgentrescure", 0);
+			shanghuTask.getTaskArgs().put("ishassellinsurance", 0);
+			break;
+		case 1:
+			shanghuTask.getTaskArgs().put("ishaswash", 0);
+			shanghuTask.getTaskArgs().put("ishascheck", 1);
+			shanghuTask.getTaskArgs().put("ishasmaintainance", 0);
+			shanghuTask.getTaskArgs().put("ishasurgentrescure", 0);
+			shanghuTask.getTaskArgs().put("ishassellinsurance", 0);
+			break;
+		case 2:
+			shanghuTask.getTaskArgs().put("ishaswash", 0);
+			shanghuTask.getTaskArgs().put("ishascheck", 0);
+			shanghuTask.getTaskArgs().put("ishasmaintainance", 0);
+			shanghuTask.getTaskArgs().put("ishasurgentrescure", 1);
+			shanghuTask.getTaskArgs().put("ishassellinsurance", 0);
+			break;
+		case 3:
+			shanghuTask.getTaskArgs().put("ishaswash", 0);
+			shanghuTask.getTaskArgs().put("ishascheck", 0);
+			shanghuTask.getTaskArgs().put("ishasmaintainance", 1);
+			shanghuTask.getTaskArgs().put("ishasurgentrescure", 0);
+			shanghuTask.getTaskArgs().put("ishassellinsurance", 0);
+			break;
+		case 4:
+			shanghuTask.getTaskArgs().put("ishaswash", 0);
+			shanghuTask.getTaskArgs().put("ishascheck", 0);
+			shanghuTask.getTaskArgs().put("ishasmaintainance", 0);
+			shanghuTask.getTaskArgs().put("ishasurgentrescure", 0);
+			shanghuTask.getTaskArgs().put("ishassellinsurance", 1);
+			break;
+		}
 		shanghuTask.start();
 	}
 
@@ -146,6 +199,7 @@ public class OneKeyWashActivity extends BaseNormalActivity implements ITaskListe
 		System.out.println(task.getResult().toString());
 		jsonArray = ((JSONObject) task.getResult()).getJSONArray("nearshops");
 		mLv_shop.onRefreshComplete();
+		mLv_shop.onLoadMoreComplete();
 		if (jsonArray.length() > 0) {
 			mLv_shop.setVisibility(View.VISIBLE);
 			tv_tip.setVisibility(View.GONE);

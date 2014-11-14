@@ -13,6 +13,7 @@ import com.sky.car.contact.ContactFragment;
 import com.sky.car.document.DocumentFragment;
 import com.sky.car.home.HomeFragment;
 import com.sky.car.myself.MyselfFragment;
+import com.sky.car.util.SHLocationManager;
 import com.sky.widget.SHDialog;
 import com.sky.widget.SHDialog.DialogClickListener;
 

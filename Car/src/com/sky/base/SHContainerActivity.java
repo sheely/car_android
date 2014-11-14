@@ -1,11 +1,12 @@
 package com.sky.base;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 
 import com.next.dynamic.SHClass;
-import com.sky.car.R;
 
 public class SHContainerActivity extends BaseActivity {
 	Fragment fragment;
@@ -18,17 +19,17 @@ public class SHContainerActivity extends BaseActivity {
 		// View view = new View(this);
 		line.setId(1);
 
-//		this.setContentView(line,new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-		setContentView(R.layout.activity_sh);
+		this.setContentView(line,new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+//		setContentView(R.layout.activity_sh);
 		if(savedInstanceState == null){
 			fragment = (Fragment)(SHClass.getInstance(str));
-//			FragmentTransaction ft = this.getSupportFragmentManager()
-//					.beginTransaction();
-//			ft.add(1,fragment, "main");
-//			ft.commit();
-			getSupportFragmentManager().beginTransaction()
-            .add(R.id.container_sh, fragment)
-            .commit();
+			FragmentTransaction ft = this.getSupportFragmentManager()
+					.beginTransaction();
+			ft.add(1,fragment, "main");
+			ft.commit();
+//			getSupportFragmentManager().beginTransaction()
+//            .add(R.id.container_sh, fragment)
+//            .commit();
 		}
 //		SHApplication.getInstance().addActivity(this);
 	}

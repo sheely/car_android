@@ -1,5 +1,6 @@
 package com.sky.car.myself;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -71,7 +72,7 @@ public class UpdateNicknameFragment extends BaseFragment implements ITaskListene
 		SHDialog.dismissProgressDiaolg();
 		Intent intent = new Intent(getActivity(),MainActivity.class);
 		intent.putExtra("name", mEt_nickname.getText().toString().trim());
-		getActivity().setResult(0, intent);
+		getActivity().setResult(Activity.RESULT_OK, intent);
 		getActivity().finish();
 	}
 

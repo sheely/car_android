@@ -23,6 +23,8 @@ public class CheckReportFragment extends BaseFragment implements ITaskListener{
 		SHDialog.ShowProgressDiaolg(getActivity(), null);
 		SHPostTaskM task = new SHPostTaskM();
 		task.setUrl(ConfigDefinition.URL+"checkreportquery.action");
+		task.getTaskArgs().put("reportid", "");
+		task.getTaskArgs().put("reporttype", 0);
 		task.setListener(this);
 		task.start();
 	}

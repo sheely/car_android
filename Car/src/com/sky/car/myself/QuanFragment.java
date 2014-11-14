@@ -36,6 +36,8 @@ public class QuanFragment extends BaseFragment implements ITaskListener{
 		quanTask = new SHPostTaskM();
 		quanTask.setUrl(ConfigDefinition.URL+"mywashticketsquery.action");
 		quanTask.setListener(this);
+		quanTask.getTaskArgs().put("tickettype", 99);
+		quanTask.getTaskArgs().put("isonlyexpired", 99);
 		quanTask.start();
 	}
 

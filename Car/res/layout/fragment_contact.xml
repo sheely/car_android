@@ -3,8 +3,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    <include
-        android:id="@+id/detailTitlebar"
-        layout="@layout/titlebar_detail" />
 
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:background="@color/titlebackgroundcolor" >
+        <RadioGroup
+            android:id="@+id/rg"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:orientation="horizontal"
+            android:layout_centerInParent="true"
+            android:background="@drawable/white_line_round"
+            android:padding="1dp">
+            <RadioButton
+                android:id="@+id/rb_0"
+                android:layout_width="90dp"
+                android:layout_height="match_parent"
+                android:button="@null"
+                android:text="需求"
+                android:textSize="@dimen/text_mid"
+                android:textColor="@color/rb_text_selector_top"
+                android:checked="true"
+                android:gravity="center"
+                android:background="@drawable/rb_left_selector"/>
+             <RadioButton
+                android:id="@+id/rb_1"
+                android:layout_width="90dp"
+                android:layout_height="match_parent"
+                android:button="@null"
+                android:text="订单"
+                android:textSize="@dimen/text_mid"
+                android:textColor="@color/rb_text_selector_top"
+                android:gravity="center"
+                android:background="@drawable/rb_right_selector"/>
+        </RadioGroup>
+    </RelativeLayout>
+	<FrameLayout
+	    android:id="@+id/frame"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"/>
 </LinearLayout>

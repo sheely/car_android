@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sky.car"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="101"
+    android:versionName="1.0.1" 
+    android:installLocation="preferExternal"  >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -99,6 +100,14 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
+         <activity
+            android:name="com.sky.car.home.AddPhotoActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:launchMode="singleTask"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+        </activity>
         <activity
             android:name="com.sky.car.home.BaoYangActivity"
             android:label="@string/app_name"
@@ -121,7 +130,8 @@
             android:name="com.sky.car.home.WashMapActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:theme="@android:style/Theme.NoTitleBar" 
+            >
         </activity>
         <activity
             android:name="cn.sharesdk.framework.ShareSDKUIShell"

@@ -30,6 +30,7 @@ import com.next.util.SHEnvironment;
 import com.sky.base.BaseNormalActivity;
 import com.sky.base.SHApplication;
 import com.sky.car.R;
+import com.sky.car.util.SHLocationManager;
 import com.sky.car.util.UserInfoManager;
 
 public class MapActivity extends BaseNormalActivity {
@@ -48,13 +49,13 @@ public class MapActivity extends BaseNormalActivity {
 		mTv_location = (TextView) findViewById(R.id.tv_location);
 		mTv_distance = (TextView) findViewById(R.id.tv_distance);
 		mBtn_daohang = (Button) findViewById(R.id.btn_daohang);
-		mTv_location.setText("当前位置："+SHApplication.getInstance().getAddress());
+		mTv_location.setText("当前位置："+SHLocationManager.getInstance().getAddress());
 		mMapView = (MapView) findViewById(R.id.bmapView);
 		mBaiduMap = mMapView.getMap();
 		MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(18.0f);
 		mBaiduMap.setMapStatus(msu);
 		initOverlay();
-		SHApplication.getInstance().setNewLocationListener(new BDLocationListener() {
+		SHLocationManager.getInstance().setNewLocationListener(new BDLocationListener() {
 			
 			@Override
 			public void onReceiveLocation(BDLocation arg0) {
@@ -63,7 +64,7 @@ public class MapActivity extends BaseNormalActivity {
 					mTv_location.setText("当前位置：正在定位...");
 					mTv_distance.setText("正在定位...");
 				}else{
-					mTv_location.setText("当前位置："+SHApplication.getInstance().getAddress());
+					mTv_location.setText("当前位置："+SHLocationManager.getInstance().getAddress());
 					LatLng currentLatLng = null;
 					try {
 						currentLatLng = new LatLng(json.getJSONObject("baidulatitude").optDouble("lat"), json.getJSONObject("baidulatitude").optDouble("lgt"));
@@ -71,7 +72,7 @@ public class MapActivity extends BaseNormalActivity {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					int d = (int) DistanceUtil.getDistance(currentLatLng, new LatLng(SHApplication.getInstance().getLat(), SHApplication.getInstance().getLng()));
+					int d = (int) DistanceUtil.getDistance(currentLatLng, new LatLng(SHLocationManager.getInstance().getLat(), SHLocationManager.getInstance().getLng()));
 					if(d == -1){
 						mTv_distance.setText("距离未知");
 					}else if(d >= 1000){
@@ -113,7 +114,7 @@ public class MapActivity extends BaseNormalActivity {
 		/**
 		 * 计算距离
 		 */
-		int d = (int) DistanceUtil.getDistance(currentLatLng, new LatLng(SHApplication.getInstance().getLat(), SHApplication.getInstance().getLng()));
+		int d = (int) DistanceUtil.getDistance(currentLatLng, new LatLng(SHLocationManager.getInstance().getLat(), SHLocationManager.getInstance().getLng()));
 		if(d == -1){
 			mTv_distance.setText("距离未知");
 		}else if(d >= 1000){

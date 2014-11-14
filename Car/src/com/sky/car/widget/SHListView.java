@@ -429,15 +429,17 @@ public class SHListView extends ListView implements OnScrollListener {
 				/**
 				 * 刚添加
 				 */
-				if(mLastItemIndex == total){
-					mEndRootView.setVisibility(View.GONE);
-					return;
-				}
+//				if(mLastItemIndex == total){
+//					System.out.println("cao...");
+//					mEndRootView.setVisibility(View.GONE);
+//					return;
+//				}
 				if (mEndState != ENDINT_LOADING) {
 					if(mIsAutoLoadMore){// 自动加载更多，我们让FootView显示 “更    多”
 						if(mCanRefresh){
 							// 存在下拉刷新并且HeadView没有正在刷新时，FootView可以自动加载更多。
 							if(mHeadState != REFRESHING){
+								System.out.println("1111111111111");
 								// FootView显示 : 更    多  ---> 加载中...
 								mEndState = ENDINT_LOADING;
 								onLoadMore();

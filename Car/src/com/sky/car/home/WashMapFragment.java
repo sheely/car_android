@@ -22,9 +22,9 @@ import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.sky.base.BaseFragment;
-import com.sky.base.SHApplication;
 import com.sky.base.SHContainerActivity;
 import com.sky.car.R;
+import com.sky.car.util.SHLocationManager;
 import com.sky.car.widget.SHImageView;
 
 /**
@@ -70,7 +70,7 @@ public class WashMapFragment extends BaseFragment {
 
 	public void initOverlay() {
 		// add marker overlay
-		LatLng currentLatLng = new LatLng(SHApplication.getInstance().getLat(), SHApplication.getInstance().getLng());
+		LatLng currentLatLng = new LatLng(SHLocationManager.getInstance().getLat(), SHLocationManager.getInstance().getLng());
 		MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(currentLatLng);
 		mBaiduMap.animateMapStatus(u);// 定位到当前位置
 		OverlayOptions ooCurrent = new MarkerOptions().position(currentLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_gcoding)).zIndex(5);

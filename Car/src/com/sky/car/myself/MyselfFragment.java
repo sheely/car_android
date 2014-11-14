@@ -23,10 +23,11 @@ import android.widget.TextView;
 import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
+import com.next.config.SHConfigManager;
 import com.next.intf.ITaskListener;
 import com.next.net.SHPostTaskM;
 import com.next.net.SHTask;
-import com.sky.base.BaseActivity;
+import com.next.util.SHEnvironment;
 import com.sky.base.BaseFragment;
 import com.sky.base.SHContainerActivity;
 import com.sky.car.R;
@@ -42,8 +43,8 @@ import com.sky.widget.SHToast;
 public class MyselfFragment extends BaseFragment implements ITaskListener{
 
 	private Button mBtn_exit;
-	private RelativeLayout mRl_name, mRl_call,mRl_share,mRl_about,mRl_mycar,mRl_quan;
-	private TextView mTv_name,mTv_phone;
+	private RelativeLayout mRl_name, mRl_call,mRl_share,mRl_about,mRl_mycar,mRl_quan,mRl_update;
+	private TextView mTv_name,mTv_phone,mTv_version;
 	private SHImageView mIv_photo;
 	SHPostTaskM selfTask,uploadTask;
 	public static final int NONE = 0;
@@ -62,6 +63,8 @@ public class MyselfFragment extends BaseFragment implements ITaskListener{
 		mBtn_exit = (Button) view.findViewById(R.id.btn_exit);
 		mRl_name = (RelativeLayout) view.findViewById(R.id.rl_name);
 		mTv_name = (TextView) view.findViewById(R.id.tv_name);
+		mTv_version = (TextView) view.findViewById(R.id.tv_version);
+		mTv_version.setText("当前版本：V"+SHEnvironment.getInstance().getVersion());
 		mTv_phone = (TextView) view.findViewById(R.id.tv_phone);
 		mIv_photo = (SHImageView) view.findViewById(R.id.iv_photo);
 		mRl_call = (RelativeLayout) view.findViewById(R.id.rl_call);
@@ -69,6 +72,7 @@ public class MyselfFragment extends BaseFragment implements ITaskListener{
 		mRl_about = (RelativeLayout) view.findViewById(R.id.rl_about);
 		mRl_mycar = (RelativeLayout) view.findViewById(R.id.rl_mycar);
 		mRl_quan = (RelativeLayout) view.findViewById(R.id.rl_quan);
+		mRl_update = (RelativeLayout) view.findViewById(R.id.rl_update);
 		OnClick onClick = new OnClick();
 		mBtn_exit.setOnClickListener(onClick);
 		mRl_name.setOnClickListener(onClick);
@@ -78,6 +82,7 @@ public class MyselfFragment extends BaseFragment implements ITaskListener{
 		mIv_photo.setOnClickListener(onClick);
 		mRl_mycar.setOnClickListener(onClick);
 		mRl_quan.setOnClickListener(onClick);
+		mRl_update.setOnClickListener(onClick);
 		requestSelfInfo();
 	}
 
@@ -94,6 +99,15 @@ public class MyselfFragment extends BaseFragment implements ITaskListener{
 		selfTask.setUrl(ConfigDefinition.URL+"meinfoquery.action");
 		selfTask.setListener(this);
 		selfTask.start();
+	}
+	
+	private void requestConfig(){
+		SHDialog.ShowProgressDiaolg(getActivity(), "检查更新...");
+		SHPostTaskM configTask = new SHPostTaskM();
+		configTask.setUrl(ConfigDefinition.URL +"getconfig.action");
+		configTask.setListener(this);
+		configTask.start();
+		SHConfigManager.getInstance().setURL(ConfigDefinition.URL +"getconfig.action");
 	}
 
 	private class OnClick implements OnClickListener {
@@ -157,7 +171,8 @@ public class MyselfFragment extends BaseFragment implements ITaskListener{
 						// TODO Auto-generated method stub
 						if(result == items[0]){
 							Intent it_take = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-							it_take.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "temp.png")));
+							Uri imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),"car_photo_temp.jpg"));
+							it_take.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 							startActivityForResult(it_take, PHOTOHRAPH);
 						}else{
 							Intent it_local = new Intent(Intent.ACTION_GET_CONTENT, null);
@@ -177,6 +192,9 @@ public class MyselfFragment extends BaseFragment implements ITaskListener{
 				intent_quan.putExtra("class", QuanFragment.class.getName());
 				startActivity(intent_quan);
 				break;
+			case R.id.rl_update:
+				requestConfig();
+				break;
 			}
 		}
 	}
@@ -184,25 +202,32 @@ public class MyselfFragment extends BaseFragment implements ITaskListener{
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
-		super.onActivityResult(requestCode, resultCode, data);
-		switch (requestCode) {
-		case 0:
-			if (data != null && data.getExtras() != null) {
-				mTv_name.setText(data.getStringExtra("name"));
-				SHToast.showToast(getActivity(), "保存成功！", SHToast.LENGTH_SHORT);
+//		super.onActivityResult(requestCode, resultCode, data);
+		if(resultCode == getActivity().RESULT_OK){
+			switch (requestCode) {
+			case 0:
+				if (data != null && data.getExtras() != null) {
+					mTv_name.setText(data.getStringExtra("name"));
+					SHToast.showToast(getActivity(), "保存成功！", SHToast.LENGTH_SHORT);
+				}
+				break;
+			case PHOTOHRAPH:
+				File picture = new File(Environment.getExternalStorageDirectory() + "/car_photo_temp.jpg");
+				startPhotoZoom(Uri.fromFile(picture));
+				break;
+			case PHOTOZOOM:
+				if(data != null){
+					startPhotoZoom(data.getData());
+				}
+				break;
+			case PHOTORESOULT:
+				if(data != null){
+					setResultPhoto(data.getExtras());
+				}
+				break;
 			}
-			break;
-		case PHOTOHRAPH:
-			File picture = new File(Environment.getExternalStorageDirectory() + "/temp.png");
-			startPhotoZoom(Uri.fromFile(picture));
-			break;
-		case PHOTOZOOM:
-			startPhotoZoom(data.getData());
-			break;
-		case PHOTORESOULT:
-			setResultPhoto(data.getExtras());
-			break;
 		}
+		
 	}
 
 	/**
@@ -300,7 +325,7 @@ public class MyselfFragment extends BaseFragment implements ITaskListener{
 	        oks.setSite(getString(R.string.app_name));
 	        // siteUrl是分享此内容的网站地址，仅在QQ空间使用
 //	        oks.setSiteUrl("http://sharesdk.cn");
-
+  
 	        // 启动分享GUI
 	        oks.show(getActivity());
 	   }
@@ -310,14 +335,19 @@ public class MyselfFragment extends BaseFragment implements ITaskListener{
 		// TODO Auto-generated method stub
 		SHDialog.dismissProgressDiaolg();
 		System.out.println(task.getResult().toString());
+		JSONObject json = (JSONObject) task.getResult();
 		if(task == selfTask){
-			JSONObject json = (JSONObject) task.getResult();
 			mTv_name.setText(json.getString("mynickname"));
 			mTv_phone.setText("手机号："+UserInfoManager.getInstance().getName());
-//			mIv_photo.setNewImgForImageSrc(true);
-//			mIv_photo.setURL(json.getString("myheadicon"));
+			mIv_photo.setNewImgForImageSrc(true);
+			mIv_photo.setURL(json.getString("myheadicon"));
 		}else if(task == uploadTask){
-			
+			mIv_photo.setNewImgForImageSrc(true);
+			mIv_photo.setURL(json.getString("headiconurl"));
+		}else{
+			if(json.getJSONObject("update").getString("newVersion").compareToIgnoreCase(SHEnvironment.getInstance().getVersion().toString())<=0){
+				SHToast.showToast(getActivity(), "当前已是最新版本！", 1000);
+			}
 		}
 	}
 

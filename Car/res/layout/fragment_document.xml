@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android_custom="http://schemas.android.com/apk/res/com.sky.car"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -89,37 +90,287 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="@color/text_color_gray" />
+        android:background="@color/line_gray_dark" />
 
-    <GridView
-        android:id="@+id/gv_dash"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:numColumns="3"
-        android:verticalSpacing="5dp"
-        android:horizontalSpacing="5dp"
-        android:gravity="center"
-        android:listSelector="@color/full_transparent"
-        android:padding="10dp"/>  
-
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/ll_item"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1.2"
+        android:orientation="vertical" 
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:padding="7dp" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:background="@drawable/bg_popup"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/tv_current_option"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:drawableTop="@drawable/icon_power"
+                    android:gravity="center"
+                    android:text="动力性"
+                    android:textColor="#019cff"
+                    android:textSize="@dimen/text_small_and_small" 
+                    android:padding="2dp"/>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" >
+
+                    <com.sky.car.widget.RoundProgressBar
+                        android:id="@+id/roundProgressBar_current"
+                        android:layout_width="35dip"
+                        android:layout_height="35dip"
+                        android:layout_marginTop="6dp"
+                        android_custom:roundColor="#D1D1D1"
+                        android_custom:roundProgressColor="#019cff"
+                        android_custom:roundWidth="2dip"
+                        android_custom:textColor="#019cff"
+                        android_custom:textSize="13sp" 
+                        android:layout_centerInParent="true"/>
+                </RelativeLayout>
+            </LinearLayout>
+            <Button
+                android:id="@+id/btn_back"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:text="返回"
+                android:textSize="@dimen/text_mid"
+                android:textColor="@color/text_color_black"
+                android:gravity="center"
+                android:background="@drawable/bg_gray_line_white_content"/>
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/line_gray_dark"/>
+
+        <GridView
+            android:id="@+id/gv_dash"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:horizontalSpacing="5dp"
+            android:listSelector="@color/full_transparent"
+            android:numColumns="3"
+            android:padding="10dp"
+            android:verticalSpacing="5dp"
+             />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_main"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.2"
+        android:background="@drawable/bg_carresearch" 
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/bg_car" />
+
+        <LinearLayout
+            android:id="@+id/ll_stimulus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/popup_bg"
+            android:orientation="horizontal"
+            android:padding="2dp"
+            android:visibility="invisible" 
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/icon_power"
+                android:gravity="center"
+                android:text="动力性"
+                android:textColor="#019cff"
+                android:textSize="@dimen/text_small_and_small" />
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+
+                <com.sky.car.widget.RoundProgressBar
+                    android:id="@+id/roundProgressBar1"
+                    android:layout_width="35dip"
+                    android:layout_height="35dip"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="6dp"
+                    android_custom:roundColor="#D1D1D1"
+                    android_custom:roundProgressColor="#019cff"
+                    android_custom:roundWidth="2dip"
+                    android_custom:textColor="#019cff"
+                    android_custom:textSize="13sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_operate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="25dp"
+            android:background="@drawable/popup_bg"
+            android:orientation="horizontal"
+            android:padding="2dp"
+            android:visibility="invisible" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/icon_controller"
+                android:gravity="center"
+                android:text="操控性"
+                android:textColor="#019cff"
+                android:textSize="@dimen/text_small_and_small" />
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+
+                <com.sky.car.widget.RoundProgressBar
+                    android:id="@+id/roundProgressBar2"
+                    android:layout_width="35dip"
+                    android:layout_height="35dip"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="6dp"
+                    android_custom:roundColor="#D1D1D1"
+                    android_custom:roundProgressColor="#019cff"
+                    android_custom:roundWidth="2dip"
+                    android_custom:textColor="#019cff"
+                    android_custom:textSize="13sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_safe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/popup_bg"
+            android:orientation="horizontal"
+            android:padding="2dp"
+            android:visibility="invisible" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/icon_safety"
+                android:gravity="center"
+                android:text="安全性"
+                android:textColor="#019cff"
+                android:textSize="@dimen/text_small_and_small" />
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+
+                <com.sky.car.widget.RoundProgressBar
+                    android:id="@+id/roundProgressBar3"
+                    android:layout_width="35dip"
+                    android:layout_height="35dip"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="6dp"
+                    android_custom:roundColor="#D1D1D1"
+                    android_custom:roundProgressColor="#019cff"
+                    android_custom:roundWidth="2dip"
+                    android_custom:textColor="#019cff"
+                    android_custom:textSize="13sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_economy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="15dp"
+            android:layout_marginRight="25dp"
+            android:background="@drawable/popup_bg"
+            android:orientation="horizontal"
+            android:padding="2dp"
+            android:visibility="invisible" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/icon_oil"
+                android:gravity="center"
+                android:text="经济性"
+                android:textColor="#019cff"
+                android:textSize="@dimen/text_small_and_small" />
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+
+                <com.sky.car.widget.RoundProgressBar
+                    android:id="@+id/roundProgressBar4"
+                    android:layout_width="35dip"
+                    android:layout_height="35dip"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="6dp"
+                    android_custom:roundColor="#D1D1D1"
+                    android_custom:roundProgressColor="#019cff"
+                    android_custom:roundWidth="2dip"
+                    android_custom:textColor="#019cff"
+                    android_custom:textSize="13sp" />
+            </RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/line_gray_dark" />
+
+    <!--
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:scrollbars="none" >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical" >
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:background="@color/text_color_gray" />
 
             <RelativeLayout
                 android:id="@+id/rl_0"
@@ -353,5 +604,123 @@
                 android:background="@color/text_color_gray" />
         </LinearLayout>
     </ScrollView>
+    -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/backgroundcolor"
+        android:orientation="vertical"
+        android:paddingTop="10dp" >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/line_gray_dark" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@color/white"
+            android:orientation="horizontal" >
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+
+                <TextView
+                    android:id="@+id/tv_check_report"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/list_selector"
+                    android:gravity="center"
+                    android:text="车辆检测报告"
+                    android:textColor="@color/text_color_black"
+                    android:textSize="@dimen/text_mid" 
+                    android:drawableLeft="@drawable/lis_icon_report"
+                    android:padding="10dp"/>
+
+                <ImageView
+                    android:id="@+id/iv_new"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/label_new"
+                    android:visibility="invisible" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="1px"
+                android:layout_height="match_parent"
+                android:background="@color/line_gray_dark" />
+
+            <TextView
+                android:id="@+id/tv_repair"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/list_selector"
+                android:gravity="center"
+                android:text="到期事件提醒"
+                android:textColor="@color/text_color_black"
+                android:textSize="@dimen/text_mid" 
+                android:padding="10dp"
+                android:drawableLeft="@drawable/lis_icon_insurance"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/line_gray_dark" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@color/white"
+            android:orientation="horizontal" >
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+
+                <TextView
+                    android:id="@+id/tv_insurance"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/list_selector"
+                    android:gravity="center"
+                    android:text="车辆维修报告"
+                    android:textColor="@color/text_color_black"
+                    android:textSize="@dimen/text_mid" 
+                    android:padding="10dp"
+                    android:drawableLeft="@drawable/lis_icon_repair"/>
+            </RelativeLayout>
+
+            <View
+                android:layout_width="1px"
+                android:layout_height="match_parent"
+                android:background="@color/line_gray_dark" />
+
+            <TextView
+                android:id="@+id/tv_condition"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/list_selector"
+                android:gravity="center"
+                android:text="车况变化记录"
+                android:textColor="@color/text_color_black"
+                android:textSize="@dimen/text_mid" 
+                android:padding="10dp"
+                android:drawableLeft="@drawable/lis_icon_status"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/line_gray_dark" />
+    </LinearLayout>
 
 </LinearLayout>

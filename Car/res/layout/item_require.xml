@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:padding="5dp" >
+
+        <com.sky.car.widget.SHImageView
+            android:id="@+id/iv_service_type"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:id="@+id/tv_service_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_toRightOf="@id/iv_service_type"
+            android:textColor="@color/text_color_black"
+            android:textSize="@dimen/text_mid" />
+
+        <TextView
+            android:id="@+id/tv_require"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_service_type"
+            android:layout_marginTop="4dp"
+            android:layout_toRightOf="@id/iv_service_type"
+            android:textColor="@color/text_color_gray"
+            android:textSize="@dimen/text_mid" />
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_small"
+            android:textColor="@color/text_color_gray"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/tv_service_type"
+            android:layout_marginRight="20dp"/>
+        
+        <ImageView
+            android:id="@+id/iv_arrow"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_arrow_right" />
+    </RelativeLayout>
+
+</RelativeLayout>
